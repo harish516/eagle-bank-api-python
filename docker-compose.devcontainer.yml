@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  devcontainer:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - .:/workspaces/eagle-bank-api-python:cached
+    command: sleep infinity
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:password@db:5432/eagle_bank
+      - REDIS_URL=redis://redis:6379
+      - CELERY_BROKER_URL=redis://redis:6379
+      - CELERY_RESULT_BACKEND=redis://redis:6379
+      - EVENT_BUS_URL=redis://redis:6379
+      - KEYCLOAK_SERVER_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=eagle-bank
+      - KEYCLOAK_CLIENT_ID=eagle-bank-api
+      - KEYCLOAK_CLIENT_SECRET=your-client-secret
+      - JWT_SECRET_KEY=your-jwt-secret-key-for-development
+      - LOG_LEVEL=DEBUG
+      - DEBUG=true
+      - ENVIRONMENT=development
+      - PYTHONPATH=/workspaces/eagle-bank-api-python
+    depends_on:
+      - db
+      - redis
+      - keycloak
+    ports:
+      - "8000:8000"
+      - "5678:5678"  # Debug port
+    networks:
+      - eagle-bank-network
+
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: eagle_bank
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - eagle-bank-network
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6381:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - eagle-bank-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://db:5432/eagle_bank
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: password
+    command: start-dev
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    depends_on:
+      - db
+    networks:
+      - eagle-bank-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  keycloak_data:
+
+networks:
+  eagle-bank-network:
+    driver: bridge

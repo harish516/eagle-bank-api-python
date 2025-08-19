@@ -1,0 +1,74 @@
+{
+    "name": "Eagle Bank API Development (Simple)",
+    "build": {
+        "dockerfile": "Dockerfile.simple",
+        "context": ".devcontainer"
+    },
+    "workspaceFolder": "/workspace",
+    // Configure tool-specific properties.
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.terminal.activateEnvironment": false,
+                "python.linting.enabled": true,
+                "python.linting.pylintEnabled": false,
+                "python.linting.flake8Enabled": true,
+                "python.formatting.provider": "black",
+                "python.formatting.blackArgs": [
+                    "--line-length=88"
+                ],
+                "python.analysis.autoImportCompletions": true,
+                "python.analysis.typeCheckingMode": "basic",
+                "files.exclude": {
+                    "**/__pycache__": true,
+                    "**/.pytest_cache": true,
+                    "**/node_modules": true
+                },
+                "terminal.integrated.defaultProfile.linux": "bash"
+            },
+            "extensions": [
+                "ms-python.python",
+                "ms-python.debugpy",
+                "ms-python.flake8",
+                "ms-python.black-formatter",
+                "ms-vscode.vscode-json",
+                "GitHub.copilot",
+                "GitHub.copilot-chat",
+                "redhat.vscode-yaml"
+            ]
+        }
+    },
+    // Use 'forwardPorts' to make a list of ports inside the container available locally.
+    "forwardPorts": [
+        8000,
+        5678
+    ],
+    "portsAttributes": {
+        "8000": {
+            "label": "Eagle Bank API",
+            "onAutoForward": "notify"
+        },
+        "5678": {
+            "label": "Python Debug Port"
+        }
+    },
+    // Environment variables
+    "containerEnv": {
+        "DATABASE_URL": "postgresql+asyncpg://postgres:password@host.docker.internal:5433/eagle_bank",
+        "REDIS_URL": "redis://host.docker.internal:6380",
+        "JWT_SECRET_KEY": "your-jwt-secret-key-for-development",
+        "KEYCLOAK_SERVER_URL": "http://host.docker.internal:8080",
+        "KEYCLOAK_REALM": "eagle-bank",
+        "KEYCLOAK_CLIENT_ID": "eagle-bank-api",
+        "KEYCLOAK_CLIENT_SECRET": "your-client-secret",
+        "LOG_LEVEL": "DEBUG",
+        "DEBUG": "true",
+        "ENVIRONMENT": "development",
+        "PYTHONPATH": "/workspace"
+    },
+    // Use 'postCreateCommand' to run commands after the container is created.
+    "postCreateCommand": "pip install -r requirements.txt && pip install -r requirements-dev.txt",
+    // Configure tool-specific properties.
+    "remoteUser": "vscode"
+}

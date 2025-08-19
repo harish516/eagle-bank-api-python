@@ -1,0 +1,64 @@
+# Simple Dev Container Dockerfile for Eagle Bank API
+FROM python:3.11-slim
+
+# Arguments
+ARG USERNAME=vscode
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+# Install system dependencies
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends \
+    git \
+    curl \
+    wget \
+    ca-certificates \
+    sudo \
+    gcc \
+    g++ \
+    make \
+    build-essential \
+    postgresql-client \
+    vim \
+    nano \
+    htop \
+    procps \
+    bash-completion \
+    tree \
+    jq \
+    && apt-get autoremove -y \
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create the user
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+# Set up Python environment
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Install Python development tools
+RUN pip install --upgrade pip setuptools wheel
+
+# Switch to the user
+USER $USERNAME
+
+# Set up shell
+RUN echo 'alias ll="ls -alF"' >> ~/.bashrc \
+    && echo 'alias la="ls -A"' >> ~/.bashrc \
+    && echo 'alias l="ls -CF"' >> ~/.bashrc \
+    && echo 'export PS1="\[\e[32m\]\u@\h:\[\e[34m\]\w\[\e[0m\]\$ "' >> ~/.bashrc
+
+# Set working directory
+WORKDIR /workspace
+
+# Set PATH to include user's local bin
+ENV PATH="/home/$USERNAME/.local/bin:$PATH"
+
+# Keep container running
+CMD ["sleep", "infinity"]

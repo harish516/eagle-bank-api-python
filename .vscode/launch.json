@@ -1,0 +1,83 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Eagle Bank API",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "app.main:app",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "8000",
+                "--log-level",
+                "debug"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "DATABASE_URL": "postgresql+asyncpg://postgres:password@localhost:5433/eagle_bank",
+                "REDIS_URL": "redis://localhost:6379",
+                "JWT_SECRET_KEY": "your-secret-key-here",
+                "KEYCLOAK_SERVER_URL": "http://localhost:8080",
+                "KEYCLOAK_REALM": "eagle-bank",
+                "KEYCLOAK_CLIENT_ID": "eagle-bank-api",
+                "KEYCLOAK_CLIENT_SECRET": "your-client-secret",
+                "LOG_LEVEL": "DEBUG",
+                "DEBUG": "true",
+                "ENVIRONMENT": "development"
+            },
+            "justMyCode": false,
+            "stopOnEntry": false,
+            "subProcess": true,
+            "redirectOutput": true,
+            "showReturnValue": true
+        },
+        {
+            "name": "Debug Eagle Bank API (Simple)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/app/main.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "REDIS_URL": "redis://localhost:6379",
+                "DEBUG": "true",
+                "LOG_LEVEL": "DEBUG"
+            },
+            "justMyCode": false,
+            "stopOnEntry": false
+        },
+        {
+            "name": "Debug Eagle Bank API (Docker Attach)",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "/app"
+                }
+            ],
+            "justMyCode": false
+        },
+        {
+            "name": "Debug Current Python File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        }
+    ]
+}
